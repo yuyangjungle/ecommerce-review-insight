@@ -376,7 +376,7 @@ function attachEvents() {
     try {
       await runAnalysis();
     } catch (error) {
-      setStatus(`Analysis failed: ${error.message}`, "error");
+      setStatus(`分析失败：${error.message}`, "error");
     }
   });
 
@@ -384,7 +384,7 @@ function attachEvents() {
     try {
       await runCompare();
     } catch (error) {
-      setStatus(`Comparison failed: ${error.message}`, "error");
+      setStatus(`对比失败：${error.message}`, "error");
     }
   });
 
