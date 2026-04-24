@@ -93,11 +93,11 @@ NEGATIVE_RULES = {
 
 PROMPT_CONFIGS = {
     "v1": {
-        "label": "v1 直接总结",
-        "description": "直接总结评论内容，结构较轻，引用覆盖不够稳定。",
+        "label": "v1 直接总结工作流",
+        "description": "直接总结评论内容，结构较轻，引用覆盖不稳定。",
     },
     "v2": {
-        "label": "v2 先抽主题再生成",
+        "label": "v2 主题优先工作流",
         "description": "先抽取主题再生成内容，并显式保留引用依据。",
     },
 }
