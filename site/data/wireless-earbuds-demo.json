@@ -1,0 +1,62 @@
+{
+  "dataset_id": "wireless-earbuds-demo",
+  "product_name": "真无线耳机示例",
+  "reviews": [
+    {
+      "product_id": "p001",
+      "review_id": "r001",
+      "rating": 5,
+      "content": "续航真的不错，平时通勤一整天都够用。",
+      "created_at": "2026-03-08"
+    },
+    {
+      "product_id": "p001",
+      "review_id": "r002",
+      "rating": 2,
+      "content": "音质一般，而且地铁里偶尔会断连。",
+      "created_at": "2026-03-09"
+    },
+    {
+      "product_id": "p001",
+      "review_id": "r003",
+      "rating": 4,
+      "content": "佩戴比较舒服，长时间戴耳朵不疼。",
+      "created_at": "2026-03-09"
+    },
+    {
+      "product_id": "p001",
+      "review_id": "r004",
+      "rating": 3,
+      "content": "降噪效果有一点，但和宣传比还是差一些。",
+      "created_at": "2026-03-10"
+    },
+    {
+      "product_id": "p001",
+      "review_id": "r005",
+      "rating": 5,
+      "content": "充电盒很小，放口袋里很方便，外观也挺好看。",
+      "created_at": "2026-03-11"
+    },
+    {
+      "product_id": "p001",
+      "review_id": "r006",
+      "rating": 2,
+      "content": "麦克风收音不太稳定，开会时对方说声音忽大忽小。",
+      "created_at": "2026-03-11"
+    },
+    {
+      "product_id": "p001",
+      "review_id": "r007",
+      "rating": 4,
+      "content": "连接速度挺快，拿出来基本秒连。",
+      "created_at": "2026-03-12"
+    },
+    {
+      "product_id": "p001",
+      "review_id": "r008",
+      "rating": 5,
+      "content": "续航满意，音量也够大，运动时戴着也不容易掉。",
+      "created_at": "2026-03-12"
+    }
+  ]
+}
