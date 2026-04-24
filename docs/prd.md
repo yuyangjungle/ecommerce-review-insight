@@ -159,11 +159,11 @@ Review Insight Copilot
 - structure completeness
 - human preference score
 
-## 10. Why it matters for portfolio
+## 10. 项目价值
 
-这个项目能够同时证明：
+这个项目聚焦以下几个产品价值点：
 
-- 你能识别真实业务问题
-- 你能把 LLM 能力拆成产品功能
-- 你理解 Prompt 和 workflow 不是空谈
-- 你知道怎么做基础评估闭环
+- 将非结构化评论转成可消费的结构化结论
+- 将主题抽取、内容生成与引用回看串成完整 workflow
+- 为评论洞察结果提供基础评估维度
+- 为后续接入真实 LLM 与线上部署预留清晰扩展路径
