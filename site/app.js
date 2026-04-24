@@ -6,6 +6,12 @@ const SAMPLE_DATASETS = [
   }
 ];
 
+const previewParams = new URLSearchParams(window.location.search);
+const previewConfig = {
+  section: previewParams.get("section") || "",
+  autoCompare: previewParams.get("autoCompare") === "1" || previewParams.get("section") === "compare"
+};
+
 const state = {
   datasets: [],
   currentResult: null,
@@ -370,6 +376,21 @@ function closeCitationDrawer() {
   document.getElementById("drawer-shell").hidden = true;
 }
 
+function scrollToPreviewSection(section) {
+  const targets = {
+    hero: document.querySelector(".hero"),
+    insights: document.querySelector(".summary-card"),
+    compare: document.getElementById("compare-section")
+  };
+
+  const target = targets[section];
+  if (!target) {
+    return;
+  }
+
+  target.scrollIntoView({ behavior: "auto", block: "start" });
+}
+
 function attachEvents() {
   document.getElementById("analysis-form").addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -437,12 +458,21 @@ function attachEvents() {
 
 async function bootstrap() {
   attachEvents();
+  if (previewConfig.section) {
+    document.body.classList.add(`preview-${previewConfig.section}`);
+  }
   setStatus("正在加载静态演示数据...", "loading");
 
   try {
     await loadDatasets();
     document.getElementById("prompt-select").value = "v2";
     await runAnalysis();
+    if (previewConfig.autoCompare) {
+      await runCompare();
+    }
+    if (previewConfig.section) {
+      window.setTimeout(() => scrollToPreviewSection(previewConfig.section), 160);
+    }
   } catch (error) {
     setStatus(`初始化失败：${error.message}`, "error");
   }
