@@ -2,6 +2,24 @@
 
 一个面向电商运营场景的评论分析 demo。系统从商品评论中抽取正负向主题、用户关注问题、卖点建议、FAQ 草案与优化方向，并支持引用回看与不同工作流结果对比。
 
+## 快速预览
+
+- 在线预览（GitHub Pages）：`https://yuyangjungle.github.io/ecommerce-review-insight/`
+- 本地完整 demo：`http://127.0.0.1:8765`
+- 静态展示版：`http://127.0.0.1:8766`
+- 项目说明：[docs/case_study.md](./docs/case_study.md)
+
+> 如果 GitHub Pages 还未生效，请在仓库 `Settings -> Pages` 中将 `Source` 设为 `GitHub Actions`。
+
+## 页面预览
+
+![页面总览](./docs/assets/hero-overview.svg)
+
+<p>
+  <img src="./docs/assets/insight-panels.svg" alt="洞察面板预览" width="59%" />
+  <img src="./docs/assets/prompt-compare.svg" alt="工作流对比预览" width="39%" />
+</p>
+
 ## 项目概览
 
 - 导入内置样例或上传 JSON 评论数据
@@ -51,13 +69,13 @@
 生成分析结果：
 
 ```powershell
-pwsh -File .\scripts\run_analysis.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\run_analysis.ps1
 ```
 
 启动交互式 demo：
 
 ```powershell
-pwsh -File .\scripts\run_demo.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\run_demo.ps1
 ```
 
 默认访问地址：
