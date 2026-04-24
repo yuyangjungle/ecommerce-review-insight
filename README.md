@@ -47,6 +47,7 @@
 - `v1` 与 `v2` 提示词工作流对比
 - citation drawer：点击引用可查看原始评论
 - 核心摘要：将原始评论压缩为可讲述的业务判断
+- `site/` 下的纯静态展示版，可部署到 GitHub Pages
 
 ## 当前版本的真实状态
 
@@ -110,6 +111,27 @@ pwsh -File .\scripts\run_demo.ps1
 
 - `http://127.0.0.1:8765`
 
+静态展示版本地预览：
+
+```powershell
+python -m http.server 8766 --directory site
+```
+
+- `http://127.0.0.1:8766`
+
+## 公网部署
+
+仓库内已经包含 GitHub Pages 工作流：
+
+- 工作流文件：`.github/workflows/deploy-pages.yml`
+- 静态站点目录：`site/`
+- 预期公开地址：`https://yuyangjungle.github.io/ecommerce-review-insight/`
+
+说明：
+
+- `apps/` 下是本地完整 demo，依赖 Python 服务。
+- `site/` 下是纯静态展示版，不依赖后端，适合公网作品集展示。
+
 ## 目录说明
 
 ```text
@@ -119,6 +141,7 @@ data/sample/          演示用样例数据
 docs/                 PRD、架构、API、作品包装材料
 prompts/              提示词模板
 scripts/              本地运行脚本
+site/                 GitHub Pages 静态展示版
 ```
 
 ## 文档入口
