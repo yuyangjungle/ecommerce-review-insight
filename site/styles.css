@@ -582,6 +582,21 @@ h1 {
   white-space: pre-wrap;
 }
 
+body.preview-insights .hero,
+body.preview-insights .summary-strip,
+body.preview-compare .hero,
+body.preview-compare .summary-strip {
+  display: none;
+}
+
+body.preview-compare .dashboard > :not(#compare-section) {
+  display: none;
+}
+
+body.preview-compare #compare-section {
+  display: block !important;
+}
+
 @media (max-width: 900px) {
   .hero,
   .dashboard,
