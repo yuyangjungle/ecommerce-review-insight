@@ -16,3 +16,5 @@ eval/results/
 .env.local
 demo-server.err.log
 demo-server.out.log
+static-site.err.log
+static-site.out.log
