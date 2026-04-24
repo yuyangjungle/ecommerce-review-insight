@@ -54,7 +54,7 @@
 后续准备作品集截图时，建议至少保留这几张：
 
 1. 首页总览
-2. Executive Summary + 指标区
+2. 核心摘要 + 指标区
 3. 主题与卖点区
 4. Prompt 对比区
 5. citation drawer 打开状态
