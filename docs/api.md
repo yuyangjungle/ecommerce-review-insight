@@ -23,7 +23,7 @@
   "datasets": [
     {
       "id": "wireless-earbuds-demo",
-      "name": "Wireless Earbuds Demo"
+      "name": "真无线耳机示例"
     }
   ]
 }
