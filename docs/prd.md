@@ -90,12 +90,14 @@ Review Insight Copilot
 
 ### Feature 2: Theme extraction
 
-基于规则 + LLM 的方式提取：
+首版以轻量规则方式提取：
 
 - 正向主题
 - 负向主题
 - 主题频次
 - 主题示例
+
+后续版本可接入 LLM 做主题命名与总结优化。
 
 ### Feature 3: Opportunity summary
 
