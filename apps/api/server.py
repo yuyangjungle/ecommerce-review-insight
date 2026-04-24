@@ -119,7 +119,7 @@ def main():
     args = parser.parse_args()
 
     server = ThreadingHTTPServer((args.host, args.port), DemoRequestHandler)
-    print(f"Demo server running at http://{args.host}:{args.port}")
+    print(f"本地演示服务已启动：http://{args.host}:{args.port}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
