@@ -2,7 +2,7 @@ import argparse
 from copy import deepcopy
 import json
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 POSITIVE_RULES = {
@@ -301,7 +301,13 @@ def build_overview(
     }
 
 
-def apply_prompt_version(base_result: Dict, prompt_version: str) -> Dict:
+def apply_prompt_version(
+    base_result: Dict,
+    prompt_version: str,
+    analysis_mode: str = "mock",
+    model_name: Optional[str] = None,
+    warnings: Optional[List[str]] = None,
+) -> Dict:
     if prompt_version not in PROMPT_CONFIGS:
         raise ValueError(f"Unsupported prompt version: {prompt_version}")
 
@@ -310,6 +316,9 @@ def apply_prompt_version(base_result: Dict, prompt_version: str) -> Dict:
         "prompt_version": prompt_version,
         "workflow_label": PROMPT_CONFIGS[prompt_version]["label"],
         "workflow_description": PROMPT_CONFIGS[prompt_version]["description"],
+        "analysis_mode": analysis_mode,
+        "model_name": model_name,
+        "warnings": warnings or [],
     }
 
     if prompt_version == "v1":
@@ -334,7 +343,7 @@ def apply_prompt_version(base_result: Dict, prompt_version: str) -> Dict:
     return result
 
 
-def analyze_dataset(dataset: Dict, prompt_version: str = "v2") -> Dict:
+def build_base_result(dataset: Dict) -> Dict:
     dataset = normalize_dataset(dataset)
     reviews = dataset["reviews"]
     positive_themes = collect_themes(reviews, POSITIVE_RULES, "positive_theme")
@@ -343,7 +352,8 @@ def analyze_dataset(dataset: Dict, prompt_version: str = "v2") -> Dict:
     assets = build_assets(positive_themes, negative_themes)
     review_lookup = build_review_lookup(reviews)
     overview = build_overview(dataset["product_name"], positive_themes, negative_themes, assets, len(reviews))
-    base_result = {
+
+    return {
         "dataset_id": dataset["dataset_id"],
         "product_name": dataset["product_name"],
         "overview": overview,
@@ -356,7 +366,17 @@ def analyze_dataset(dataset: Dict, prompt_version: str = "v2") -> Dict:
         },
         "assets": assets,
     }
-    return apply_prompt_version(base_result, prompt_version)
+
+
+def analyze_dataset(
+    dataset: Dict,
+    prompt_version: str = "v2",
+    analysis_mode: str = "mock",
+    model_name: Optional[str] = None,
+    warnings: Optional[List[str]] = None,
+) -> Dict:
+    base_result = build_base_result(dataset)
+    return apply_prompt_version(base_result, prompt_version, analysis_mode, model_name, warnings)
 
 
 def evaluate_prompt_versions(dataset: Dict, left_prompt_version: str, right_prompt_version: str) -> Dict:
