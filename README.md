@@ -1,6 +1,6 @@
 # 电商评论洞察助手 | Review Insight Copilot
 
-一个面向电商运营场景的评论分析 demo。系统从商品评论中抽取正负向主题、用户关注问题、卖点建议、FAQ 草案与优化方向，并支持引用回看与不同工作流结果对比。
+一个面向电商运营场景的评论分析 demo。系统从商品评论中抽取正负向主题、用户关注问题、卖点建议、FAQ 草案与优化方向，并支持引用回看与不同工作流结果对比。当前版本支持 `mock` 演示模式，以及基于 OpenAI 兼容接口的可选 `规则抽取 + LLM 生成` 混合模式。
 
 ## 快速预览
 
@@ -40,8 +40,9 @@
 
 - `apps/` 提供本地完整 demo，包含 Python 后端与前端页面
 - `site/` 提供纯静态展示版，可部署到 GitHub Pages
-- 当前分析引擎使用轻量规则与 mock workflow，用于验证产品流程、结果结构与评估方式
-- 真实 LLM provider、持久化存储和线上用户系统尚未接入
+- 当前分析引擎默认使用轻量规则与 mock workflow，用于验证产品流程、结果结构与评估方式
+- 已预留基于 OpenAI 兼容接口的可选 LLM 接入，用于内容层生成与润色
+- 持久化存储和线上用户系统尚未接入
 
 ## 核心流程
 
@@ -81,6 +82,23 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run_demo.ps1
 默认访问地址：
 
 - `http://127.0.0.1:8765`
+
+## 可选 LLM 接入
+
+项目默认可以直接以 `mock` 模式运行；如果希望启用混合模式，请设置环境变量：
+
+```powershell
+$env:REVIEW_INSIGHT_USE_LLM="auto"
+$env:OPENAI_API_KEY="你的 API Key"
+$env:OPENAI_BASE_URL="https://api.openai.com/v1"
+$env:OPENAI_MODEL="gpt-4.1-mini"
+```
+
+说明：
+
+- 当 `OPENAI_API_KEY` 未提供时，系统自动使用本地 `mock` 模式
+- 当模型调用失败时，系统会自动回退到 `mock` 输出，并在页面上提示
+- 示例环境变量可参考：[.env.example](./.env.example)
 
 静态展示版本地预览：
 
