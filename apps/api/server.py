@@ -4,9 +4,11 @@ import mimetypes
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from typing import Dict
 from urllib.parse import urlparse
 
-from mock_pipeline import analyze_dataset, evaluate_prompt_versions, load_dataset, normalize_dataset
+from llm_pipeline import analyze_dataset, get_runtime_status
+from mock_pipeline import load_dataset, normalize_dataset
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -44,6 +46,35 @@ def resolve_dataset_from_payload(payload):
     raise FileNotFoundError("Dataset payload is missing dataset_id or dataset")
 
 
+def evaluate_prompt_versions(dataset: Dict, left_prompt_version: str, right_prompt_version: str) -> Dict:
+    left_result = analyze_dataset(dataset, left_prompt_version)
+    right_result = analyze_dataset(dataset, right_prompt_version)
+
+    left_score = left_result["evaluation"]["human_usable_score"] + left_result["evaluation"]["trust_score"]
+    right_score = right_result["evaluation"]["human_usable_score"] + right_result["evaluation"]["trust_score"]
+
+    if left_score == right_score:
+        winner = "tie"
+    else:
+        winner = left_prompt_version if left_score > right_score else right_prompt_version
+
+    return {
+        "dataset_id": dataset["dataset_id"],
+        "winner": winner,
+        "left": {
+            "prompt_version": left_prompt_version,
+            "result": left_result,
+            "scores": left_result["evaluation"],
+        },
+        "right": {
+            "prompt_version": right_prompt_version,
+            "result": right_result,
+            "scores": right_result["evaluation"],
+        },
+        "runtime": get_runtime_status(),
+    }
+
+
 class DemoRequestHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         return
@@ -51,7 +82,7 @@ class DemoRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urlparse(self.path)
         if parsed.path == "/api/health":
-            self.send_json({"status": "ok"})
+            self.send_json({"status": "ok", "runtime": get_runtime_status()})
             return
         if parsed.path == "/api/datasets":
             self.send_json({"datasets": list_datasets()})
