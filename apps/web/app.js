@@ -3,7 +3,8 @@ const state = {
   currentResult: null,
   compareResult: null,
   uploadedDataset: null,
-  uploadedFileName: ""
+  uploadedFileName: "",
+  runtime: null
 };
 
 function fetchJSON(url, options = {}) {
@@ -26,7 +27,7 @@ function escapeHtml(value) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
+    .replace(/\"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
 
@@ -34,6 +35,34 @@ function setStatus(message, type = "neutral") {
   const node = document.getElementById("status-line");
   node.textContent = message;
   node.dataset.state = type;
+}
+
+function humanizeAnalysisMode(mode) {
+  const mapping = {
+    mock: "规则抽取（mock）",
+    hybrid_llm: "规则抽取 + LLM 生成",
+    mock_fallback: "LLM 调用失败，已回退 mock"
+  };
+
+  return mapping[mode] || "未知模式";
+}
+
+function renderRuntimeStatus(runtime = {}, warnings = []) {
+  const modeText = humanizeAnalysisMode(runtime.analysis_mode || "mock");
+  const modelText = runtime.model_name || "未接入";
+  document.getElementById("runtime-mode-banner").textContent = modeText;
+  document.getElementById("runtime-model-banner").textContent = modelText;
+  document.getElementById("analysis-mode-label").textContent = modeText;
+  document.getElementById("runtime-model-label").textContent = modelText;
+
+  const warningNode = document.getElementById("runtime-warning");
+  if (warnings.length) {
+    warningNode.textContent = warnings.join("；");
+  } else if (runtime.analysis_mode === "hybrid_llm") {
+    warningNode.textContent = `当前已启用真实模型：${modelText}。主题抽取仍走结构化流程，内容层由 LLM 辅助生成。`;
+  } else {
+    warningNode.textContent = "当前使用本地 mock 结果，接入 OPENAI_API_KEY 后会自动启用混合模式。";
+  }
 }
 
 function emptyState(message) {
@@ -245,14 +274,21 @@ function renderCompare(compareResult) {
 
 function renderResult(result) {
   state.currentResult = result;
+  state.runtime = {
+    analysis_mode: result.metadata.analysis_mode,
+    model_name: result.metadata.model_name
+  };
   document.getElementById("product-name").textContent = result.product_name;
   document.getElementById("workflow-label").textContent = result.metadata.workflow_label;
+  document.getElementById("analysis-mode-label").textContent = humanizeAnalysisMode(result.metadata.analysis_mode);
+  document.getElementById("runtime-model-label").textContent = result.metadata.model_name || "未接入";
   document.getElementById("citation-coverage").textContent = `${Math.round(
     result.evaluation.citation_coverage * 100
   )}%`;
   document.getElementById("data-source-label").textContent = state.uploadedDataset
     ? `已上传：${state.uploadedFileName}`
     : "内置样例";
+  renderRuntimeStatus(state.runtime, result.metadata.warnings || []);
 
   renderOverview(result);
   renderSourceReviews(result);
@@ -323,6 +359,12 @@ async function loadDatasets() {
     .join("");
 }
 
+async function loadRuntimeStatus() {
+  const payload = await fetchJSON("/api/health");
+  state.runtime = payload.runtime || null;
+  renderRuntimeStatus(state.runtime || {});
+}
+
 async function runAnalysis() {
   const promptVersion = document.getElementById("prompt-select").value;
   setStatus("正在运行分析...", "loading");
@@ -333,7 +375,12 @@ async function runAnalysis() {
   });
 
   renderResult(result);
-  setStatus(`已生成 ${result.product_name} 的 ${result.metadata.workflow_label} 分析结果。`, "success");
+  const warnings = result.metadata.warnings || [];
+  if (warnings.length) {
+    setStatus(`已生成 ${result.product_name} 的分析结果，但模型调用失败并已回退为 mock。`, "neutral");
+  } else {
+    setStatus(`已生成 ${result.product_name} 的 ${result.metadata.workflow_label} 分析结果。`, "success");
+  }
 }
 
 async function runCompare() {
@@ -349,7 +396,13 @@ async function runCompare() {
 
   state.compareResult = result;
   renderCompare(result);
-  setStatus("提示词对比结果已更新。", "success");
+  const leftWarnings = result.left?.result?.metadata?.warnings || [];
+  const rightWarnings = result.right?.result?.metadata?.warnings || [];
+  if (leftWarnings.length || rightWarnings.length) {
+    setStatus("提示词对比已更新，其中至少一侧因模型调用失败回退为 mock。", "neutral");
+  } else {
+    setStatus("提示词对比结果已更新。", "success");
+  }
 }
 
 function openCitationDrawer(reviewId) {
@@ -441,6 +494,7 @@ async function bootstrap() {
   setStatus("正在加载数据集...", "loading");
 
   try {
+    await loadRuntimeStatus();
     await loadDatasets();
     document.getElementById("prompt-select").value = "v2";
     await runAnalysis();
