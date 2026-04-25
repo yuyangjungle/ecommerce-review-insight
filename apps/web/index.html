@@ -16,6 +16,16 @@
             把商品评论、问答与用户反馈转成可执行的卖点、FAQ 与优化建议，并对不同
             工作流的输出质量做可视化比较。
           </p>
+          <div class="runtime-banner">
+            <article class="runtime-item">
+              <span>运行模式</span>
+              <strong id="runtime-mode-banner">--</strong>
+            </article>
+            <article class="runtime-item">
+              <span>模型</span>
+              <strong id="runtime-model-banner">--</strong>
+            </article>
+          </div>
         </div>
 
         <div class="hero-panel">
@@ -50,6 +60,7 @@
             <p class="helper-text" id="source-status">
               当前使用内置样例数据。上传 JSON 后会优先分析你自己的评论数据。
             </p>
+            <p class="helper-text warning-text" id="runtime-warning">当前尚未返回运行模式信息。</p>
 
             <p class="status-line" id="status-line" data-state="neutral">等待开始分析。</p>
           </form>
@@ -64,6 +75,14 @@
         <article class="hero-stat">
           <span class="stat-label">工作流</span>
           <strong id="workflow-label">--</strong>
+        </article>
+        <article class="hero-stat">
+          <span class="stat-label">运行模式</span>
+          <strong id="analysis-mode-label">--</strong>
+        </article>
+        <article class="hero-stat">
+          <span class="stat-label">模型</span>
+          <strong id="runtime-model-label">--</strong>
         </article>
         <article class="hero-stat">
           <span class="stat-label">引用覆盖率</span>
