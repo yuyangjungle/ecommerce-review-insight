@@ -13,13 +13,16 @@ from mock_pipeline import (
 )
 
 
-DEFAULT_BASE_URL = "https://api.openai.com/v1"
-DEFAULT_MODEL = "gpt-4.1-mini"
+DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
+DEFAULT_OPENAI_MODEL = "gpt-4.1-mini"
+DEFAULT_DEEPSEEK_BASE_URL = "https://api.deepseek.com"
+DEFAULT_DEEPSEEK_MODEL = "deepseek-v4-flash"
 
 
 @dataclass
 class LLMConfig:
     enabled: bool
+    provider_name: Optional[str]
     mode_setting: str
     api_key: Optional[str]
     base_url: str
@@ -33,10 +36,29 @@ def _read_mode_setting() -> str:
 
 def load_llm_config() -> LLMConfig:
     mode_setting = _read_mode_setting()
-    api_key = (os.getenv("OPENAI_API_KEY") or "").strip() or None
-    base_url = (os.getenv("OPENAI_BASE_URL") or DEFAULT_BASE_URL).strip().rstrip("/")
-    model_name = (os.getenv("OPENAI_MODEL") or DEFAULT_MODEL).strip() or None
     timeout_seconds = int(os.getenv("OPENAI_TIMEOUT_SECONDS") or "45")
+
+    deepseek_api_key = (os.getenv("DEEPSEEK_API_KEY") or "").strip() or None
+    openai_api_key = (os.getenv("OPENAI_API_KEY") or "").strip() or None
+
+    if deepseek_api_key:
+        provider_name = "DeepSeek"
+        api_key = deepseek_api_key
+        base_url = (
+            os.getenv("DEEPSEEK_BASE_URL")
+            or os.getenv("OPENAI_BASE_URL")
+            or DEFAULT_DEEPSEEK_BASE_URL
+        ).strip().rstrip("/")
+        model_name = (
+            os.getenv("DEEPSEEK_MODEL")
+            or os.getenv("OPENAI_MODEL")
+            or DEFAULT_DEEPSEEK_MODEL
+        ).strip() or None
+    else:
+        provider_name = "OpenAI-compatible" if openai_api_key else None
+        api_key = openai_api_key
+        base_url = (os.getenv("OPENAI_BASE_URL") or DEFAULT_OPENAI_BASE_URL).strip().rstrip("/")
+        model_name = (os.getenv("OPENAI_MODEL") or DEFAULT_OPENAI_MODEL).strip() or None
 
     enabled = bool(
         api_key
@@ -46,6 +68,7 @@ def load_llm_config() -> LLMConfig:
 
     return LLMConfig(
         enabled=enabled,
+        provider_name=provider_name,
         mode_setting=mode_setting,
         api_key=api_key,
         base_url=base_url,
@@ -60,6 +83,7 @@ def get_runtime_status() -> Dict:
         "llm_enabled": config.enabled,
         "analysis_mode": "hybrid_llm" if config.enabled else "mock",
         "mode_setting": config.mode_setting,
+        "provider_name": config.provider_name if config.enabled else None,
         "model_name": config.model_name if config.enabled else None,
     }
 
@@ -147,6 +171,8 @@ def _call_llm_for_refinement(prompt_messages: List[Dict], config: LLMConfig) -> 
         "temperature": 0.3,
         "max_tokens": 1600,
     }
+    if config.provider_name == "DeepSeek":
+        base_payload["thinking"] = {"type": "disabled"}
 
     for include_response_format in (True, False):
         payload = dict(base_payload)
@@ -262,6 +288,7 @@ def analyze_dataset(dataset: Dict, prompt_version: str = "v2") -> Dict:
         base_result,
         prompt_version,
         analysis_mode="hybrid_llm",
+        provider_name=config.provider_name,
         model_name=config.model_name,
     )
 
@@ -275,6 +302,7 @@ def analyze_dataset(dataset: Dict, prompt_version: str = "v2") -> Dict:
             dataset,
             prompt_version,
             analysis_mode="mock_fallback",
+            provider_name=config.provider_name,
             model_name=config.model_name,
             warnings=[warning],
         )
