@@ -1,15 +1,18 @@
 # 电商评论洞察助手 | Review Insight Copilot
 
-一个面向电商运营场景的评论分析 demo。系统从商品评论中抽取正负向主题、用户关注问题、卖点建议、FAQ 草案与优化方向，并支持引用回看与不同工作流结果对比。当前版本支持 `mock` 演示模式，以及基于 OpenAI 兼容接口的可选 `规则抽取 + LLM 生成` 混合模式。
+一个面向电商运营场景的评论分析 Demo。系统从商品评论中抽取正负向主题、用户关注问题、卖点建议、FAQ 草案与优化方向，并支持引用回看与不同工作流结果对比。当前仓库同时提供公开可访问的静态展示页，以及带 Python 后端的本地完整 Demo。
 
-## 快速预览
+## 在线体验
 
-- 在线预览（GitHub Pages）：`https://yuyangjungle.github.io/ecommerce-review-insight/`
-- 本地完整 demo：`http://127.0.0.1:8765`
-- 静态展示版：`http://127.0.0.1:8766`
+- 在线 Demo：[https://yuyangjungle.github.io/ecommerce-review-insight/](https://yuyangjungle.github.io/ecommerce-review-insight/)
 - 项目说明：[docs/case_study.md](./docs/case_study.md)
+- 技术架构：[docs/architecture.md](./docs/architecture.md)
 
-> 如果 GitHub Pages 还未生效，请在仓库 `Settings -> Pages` 中将 `Source` 设为 `GitHub Actions`。
+公开页说明：
+
+- 当前公开版本部署在 GitHub Pages
+- 页面使用 `site/` 目录中的静态站点
+- 评论分析逻辑在浏览器本地执行，适合直接预览和快速体验
 
 ## 页面预览
 
@@ -110,13 +113,12 @@ python -m http.server 8766 --directory site
 
 ## GitHub Pages
 
-仓库已包含 GitHub Pages 工作流与静态站点目录：
+当前公开页已部署到 GitHub Pages：
 
+- 公开地址：`https://yuyangjungle.github.io/ecommerce-review-insight/`
 - 工作流文件：`.github/workflows/deploy-pages.yml`
 - 静态站点目录：`site/`
-- 预期公开地址：`https://yuyangjungle.github.io/ecommerce-review-insight/`
-
-如果需要启用 Pages 发布，请在仓库 `Settings -> Pages` 中将 `Source` 设为 `GitHub Actions`。
+- 发布方式：`GitHub Actions`
 
 ## 目录说明
 
