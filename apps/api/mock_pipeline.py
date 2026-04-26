@@ -305,6 +305,7 @@ def apply_prompt_version(
     base_result: Dict,
     prompt_version: str,
     analysis_mode: str = "mock",
+    provider_name: Optional[str] = None,
     model_name: Optional[str] = None,
     warnings: Optional[List[str]] = None,
 ) -> Dict:
@@ -317,6 +318,7 @@ def apply_prompt_version(
         "workflow_label": PROMPT_CONFIGS[prompt_version]["label"],
         "workflow_description": PROMPT_CONFIGS[prompt_version]["description"],
         "analysis_mode": analysis_mode,
+        "provider_name": provider_name,
         "model_name": model_name,
         "warnings": warnings or [],
     }
@@ -372,11 +374,12 @@ def analyze_dataset(
     dataset: Dict,
     prompt_version: str = "v2",
     analysis_mode: str = "mock",
+    provider_name: Optional[str] = None,
     model_name: Optional[str] = None,
     warnings: Optional[List[str]] = None,
 ) -> Dict:
     base_result = build_base_result(dataset)
-    return apply_prompt_version(base_result, prompt_version, analysis_mode, model_name, warnings)
+    return apply_prompt_version(base_result, prompt_version, analysis_mode, provider_name, model_name, warnings)
 
 
 def evaluate_prompt_versions(dataset: Dict, left_prompt_version: str, right_prompt_version: str) -> Dict:
