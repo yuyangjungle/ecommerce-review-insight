@@ -1,17 +1,17 @@
-# Architecture and Workflow
+# 技术架构与工作流
 
-## 1. System overview
+## 1. 系统概览
 
 系统分为四层：
 
-1. Data layer
-2. Workflow layer
-3. Service/API layer
-4. Presentation layer
+1. 数据层
+2. 工作流层
+3. 服务与 API 层
+4. 展示层
 
-## 2. Workflow design
+## 2. 工作流设计
 
-### Step 1: Input normalization
+### 步骤 1：输入标准化
 
 目标：将评论、问答、竞品信息统一为标准结构。
 
@@ -22,7 +22,7 @@
 - rating
 - metadata
 
-### Step 2: Theme extraction
+### 步骤 2：主题抽取
 
 目标：抽取评论中的高频主题与情绪倾向。
 
@@ -30,13 +30,13 @@
 
 - 规则切分文本
 - 按关键词或简单分类聚合
-- 以结构化结果验证 workflow 与界面形态
+- 以结构化结果验证工作流与界面形态
 
 后续版本：
 
-- 接入 LLM 做主题命名与总结
+- 接入真实 LLM 做主题命名与总结
 
-### Step 3: Insight generation
+### 步骤 3：洞察生成
 
 基于主题与原始文本生成：
 
@@ -45,43 +45,43 @@
 - 负向改进点
 - FAQ 建议
 
-### Step 4: Citation linking
+### 步骤 4：引用关联
 
 将每条洞察关联到 1 到 3 条代表性评论，降低“黑盒总结”风险。
 
-### Step 5: Prompt evaluation
+### 步骤 5：提示词评估
 
-同一份输入跑两套 Prompt：
+同一份输入跑两套提示词工作流：
 
-- v1: 直接总结
-- v2: 先抽主题再总结
+- v1：直接总结
+- v2：先抽主题再总结
 
 对比输出结构与可用性。
 
-## 3. Recommended architecture
+## 3. 推荐架构
 
-### Frontend
+### 前端
 
-- Dashboard 页面
-- Dataset selector
-- Result cards
-- Citation drawer
-- Prompt comparison view
+- 分析看板页面
+- 数据集选择器
+- 结果卡片
+- 引用抽屉
+- 提示词对比视图
 
-### Backend
+### 后端
 
 - `/health`
 - `/datasets`
 - `/analyze`
 - `/evaluate`
 
-### Storage
+### 存储
 
 首版使用本地 JSON + SQLite。
 
-## 4. Data model
+## 4. 数据模型
 
-### Review
+### 评论
 
 ```json
 {
@@ -93,7 +93,7 @@
 }
 ```
 
-### Insight
+### 洞察
 
 ```json
 {
@@ -104,7 +104,7 @@
 }
 ```
 
-### Generated asset
+### 生成结果
 
 ```json
 {
@@ -115,24 +115,24 @@
 }
 ```
 
-## 5. Evaluation plan
+## 5. 评估方案
 
-### Offline evaluation
+### 离线评估
 
 - 结构完整度：是否包含主题、洞察、卖点、FAQ、引用
 - 引用覆盖率：洞察是否附带引用
 - 人工可用性：1 到 5 分
 - 人工可信度：1 到 5 分
 
-### Demo evaluation
+### 演示版评估
 
-支持展示 Prompt v1 与 Prompt v2 输出差异。
+支持展示提示词 `v1` 与 `v2` 的输出差异。
 
-## 6. Design emphasis
+## 6. 设计重点
 
 当前架构重点强调：
 
 - 先抽主题再生成，优先控制输出结构
 - 为结论保留引用，提升结果可回溯性
 - 评估不只关注生成流畅度，也关注结构和依据
-- 首版以轻量可解释方案验证交互流程与结果形态
+- 首版以轻量、可解释方案验证交互流程与结果形态
