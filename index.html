@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>电商评论洞察助手</title>
+    <link rel="stylesheet" href="/apps/web/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">AI 产品作品演示</p>
+          <h1>电商评论洞察助手</h1>
+          <p class="hero-text">
+            把商品评论、问答与用户反馈转成可执行的卖点、FAQ 与优化建议，并对不同
+            工作流的输出质量做可视化比较。
+          </p>
+          <div class="runtime-banner">
+            <article class="runtime-item">
+              <span>运行模式</span>
+              <strong id="runtime-mode-banner">--</strong>
+            </article>
+            <article class="runtime-item">
+              <span>模型</span>
+              <strong id="runtime-model-banner">--</strong>
+            </article>
+          </div>
+        </div>
+
+        <div class="hero-panel">
+          <form id="analysis-form" class="control-panel">
+            <label class="control-field">
+              <span>样例数据集</span>
+              <select id="dataset-select"></select>
+            </label>
+
+            <label class="control-field">
+              <span>上传评论 JSON</span>
+              <input id="dataset-file" type="file" accept=".json,application/json" />
+            </label>
+
+            <label class="control-field">
+              <span>提示词工作流</span>
+              <select id="prompt-select">
+                <option value="v1">v1 直接总结</option>
+                <option value="v2">v2 先抽主题再生成</option>
+              </select>
+            </label>
+
+            <div class="button-row">
+              <button type="submit" class="action-button primary">运行分析</button>
+              <button type="button" id="compare-btn" class="action-button secondary">比较 v1 和 v2</button>
+            </div>
+
+            <div class="button-row compact">
+              <button type="button" id="clear-upload-btn" class="action-button ghost">切回样例数据</button>
+            </div>
+
+            <p class="helper-text" id="source-status">
+              当前使用内置样例数据。上传 JSON 后会优先分析你自己的评论数据。
+            </p>
+            <p class="helper-text warning-text" id="runtime-warning">当前尚未返回运行模式信息。</p>
+
+            <p class="status-line" id="status-line" data-state="neutral">等待开始分析。</p>
+          </form>
+        </div>
+      </header>
+
+      <section class="summary-strip">
+        <article class="hero-stat">
+          <span class="stat-label">商品</span>
+          <strong id="product-name">--</strong>
+        </article>
+        <article class="hero-stat">
+          <span class="stat-label">工作流</span>
+          <strong id="workflow-label">--</strong>
+        </article>
+        <article class="hero-stat">
+          <span class="stat-label">运行模式</span>
+          <strong id="analysis-mode-label">--</strong>
+        </article>
+        <article class="hero-stat">
+          <span class="stat-label">模型</span>
+          <strong id="runtime-model-label">--</strong>
+        </article>
+        <article class="hero-stat">
+          <span class="stat-label">引用覆盖率</span>
+          <strong id="citation-coverage">--</strong>
+        </article>
+        <article class="hero-stat">
+          <span class="stat-label">数据来源</span>
+          <strong id="data-source-label">--</strong>
+        </article>
+      </section>
+
+      <main class="dashboard">
+        <section class="card card-wide summary-card">
+          <div class="section-head">
+            <h2>核心摘要</h2>
+            <p>把原始评论压缩成便于快速消费的业务摘要。</p>
+          </div>
+          <div class="overview-grid">
+            <div class="overview-main">
+              <h3 id="overview-headline">--</h3>
+              <p id="overview-text">--</p>
+            </div>
+            <div class="overview-side" id="overview-metrics"></div>
+          </div>
+        </section>
+
+        <section class="card card-wide">
+          <div class="section-head">
+            <h2>原始评论样本</h2>
+            <p>展示这次分析实际参考的评论样本，点击引用标签可以进一步查看原文。</p>
+          </div>
+          <div class="review-feed" id="source-review-list"></div>
+        </section>
+
+        <section class="card card-wide">
+          <div class="section-head">
+            <h2>核心问题</h2>
+            <p>从评论噪音里抽出用户真正关心的几个点。</p>
+          </div>
+          <div class="question-list" id="question-list"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>正向主题</h2>
+            <p>正向卖点可以直接用于详情页或投放文案。</p>
+          </div>
+          <div class="chip-list" id="positive-themes"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>风险主题</h2>
+            <p>负向主题适合拿来做产品优化与预期管理。</p>
+          </div>
+          <div class="chip-list" id="negative-themes"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>卖点建议</h2>
+            <p>基于真实评论证据沉淀出的核心卖点建议。</p>
+          </div>
+          <div class="stack-list" id="selling-points"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>FAQ 草案</h2>
+            <p>面向商品页和客服场景的高频问答草案。</p>
+          </div>
+          <div class="stack-list" id="faq-list"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>优化方向</h2>
+            <p>把负向反馈收束成可以被运营和产品直接消费的动作建议。</p>
+          </div>
+          <div class="stack-list" id="optimization-list"></div>
+        </section>
+
+        <section class="card card-wide">
+          <div class="section-head">
+            <h2>评估概览</h2>
+            <p>先用最轻量的评估方法，把“感觉好不好”变成“能不能比”。</p>
+          </div>
+          <div class="metrics-grid" id="metrics-grid"></div>
+        </section>
+
+        <section class="card card-wide" id="compare-section" hidden>
+          <div class="section-head">
+            <h2>提示词对比</h2>
+            <p id="compare-winner">对比两套提示词工作流。</p>
+          </div>
+          <div class="compare-grid" id="compare-grid"></div>
+        </section>
+      </main>
+    </div>
+
+    <div class="drawer-shell" id="drawer-shell" hidden>
+      <button class="drawer-backdrop" id="drawer-backdrop" aria-label="关闭引用抽屉"></button>
+      <aside class="drawer-panel" aria-live="polite">
+        <div class="drawer-head">
+          <div>
+            <p class="drawer-kicker">引用证据</p>
+            <h3 id="drawer-review-id">--</h3>
+          </div>
+          <button class="drawer-close" id="drawer-close" aria-label="关闭引用抽屉">×</button>
+        </div>
+        <div class="drawer-meta">
+          <span id="drawer-rating">--</span>
+          <span id="drawer-date">--</span>
+        </div>
+        <div class="drawer-content" id="drawer-content">--</div>
+      </aside>
+    </div>
+
+    <script src="/apps/web/app.js"></script>
+  </body>
+</html>
