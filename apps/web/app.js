@@ -27,7 +27,7 @@ function escapeHtml(value) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
+    .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
 
@@ -47,9 +47,16 @@ function humanizeAnalysisMode(mode) {
   return mapping[mode] || "未知模式";
 }
 
+function buildModelLabel(runtime = {}) {
+  if (!runtime.model_name) {
+    return "未接入";
+  }
+  return runtime.provider_name ? `${runtime.provider_name} / ${runtime.model_name}` : runtime.model_name;
+}
+
 function renderRuntimeStatus(runtime = {}, warnings = []) {
   const modeText = humanizeAnalysisMode(runtime.analysis_mode || "mock");
-  const modelText = runtime.model_name || "未接入";
+  const modelText = buildModelLabel(runtime);
   document.getElementById("runtime-mode-banner").textContent = modeText;
   document.getElementById("runtime-model-banner").textContent = modelText;
   document.getElementById("analysis-mode-label").textContent = modeText;
@@ -61,7 +68,7 @@ function renderRuntimeStatus(runtime = {}, warnings = []) {
   } else if (runtime.analysis_mode === "hybrid_llm") {
     warningNode.textContent = `当前已启用真实模型：${modelText}。主题抽取仍走结构化流程，内容层由 LLM 辅助生成。`;
   } else {
-    warningNode.textContent = "当前使用本地 mock 结果，接入 OPENAI_API_KEY 后会自动启用混合模式。";
+    warningNode.textContent = "当前使用本地模拟结果，接入 DEEPSEEK_API_KEY 后会自动启用混合模式。";
   }
 }
 
@@ -276,12 +283,13 @@ function renderResult(result) {
   state.currentResult = result;
   state.runtime = {
     analysis_mode: result.metadata.analysis_mode,
+    provider_name: result.metadata.provider_name,
     model_name: result.metadata.model_name
   };
   document.getElementById("product-name").textContent = result.product_name;
   document.getElementById("workflow-label").textContent = result.metadata.workflow_label;
   document.getElementById("analysis-mode-label").textContent = humanizeAnalysisMode(result.metadata.analysis_mode);
-  document.getElementById("runtime-model-label").textContent = result.metadata.model_name || "未接入";
+  document.getElementById("runtime-model-label").textContent = buildModelLabel(result.metadata);
   document.getElementById("citation-coverage").textContent = `${Math.round(
     result.evaluation.citation_coverage * 100
   )}%`;
@@ -302,7 +310,7 @@ function renderResult(result) {
     result.assets.optimization_suggestions,
     "title",
     "content",
-    "这个 prompt 版本没有稳定输出优化建议。"
+    "这个提示词版本没有稳定输出优化建议。"
   );
   renderMetrics(result);
 }
@@ -377,7 +385,7 @@ async function runAnalysis() {
   renderResult(result);
   const warnings = result.metadata.warnings || [];
   if (warnings.length) {
-    setStatus(`已生成 ${result.product_name} 的分析结果，但模型调用失败并已回退为 mock。`, "neutral");
+    setStatus(`已生成 ${result.product_name} 的分析结果，但模型调用失败并已回退为模拟结果。`, "neutral");
   } else {
     setStatus(`已生成 ${result.product_name} 的 ${result.metadata.workflow_label} 分析结果。`, "success");
   }
@@ -399,7 +407,7 @@ async function runCompare() {
   const leftWarnings = result.left?.result?.metadata?.warnings || [];
   const rightWarnings = result.right?.result?.metadata?.warnings || [];
   if (leftWarnings.length || rightWarnings.length) {
-    setStatus("提示词对比已更新，其中至少一侧因模型调用失败回退为 mock。", "neutral");
+    setStatus("提示词对比已更新，其中至少一侧因模型调用失败回退为模拟结果。", "neutral");
   } else {
     setStatus("提示词对比结果已更新。", "success");
   }
