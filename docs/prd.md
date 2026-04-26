@@ -1,16 +1,16 @@
-# MVP PRD
+# MVP 产品需求文档
 
-## 1. Project overview
+## 1. 项目概述
 
-### Working title
+### 项目名称
 
-Review Insight Copilot
+电商评论洞察助手
 
-### One-line summary
+### 一句话介绍
 
 帮助电商运营或商品经理快速从评论、问答和竞品信息中提取用户痛点、卖点机会和可直接使用的文案建议。
 
-## 2. Problem statement
+## 2. 问题定义
 
 在商品运营场景中，用户反馈高度非结构化，评论数量大、噪音高、表达分散。运营人员通常要手动阅读大量评论，才能总结出：
 
@@ -22,30 +22,30 @@ Review Insight Copilot
 
 这个过程费时、主观、难复用，也不容易形成标准化的分析流程。
 
-## 3. Target users
+## 3. 目标用户
 
-### Primary users
+### 核心用户
 
 - 电商运营
 - 商品经理
 - 内容运营
 
-### Secondary users
+### 次级用户
 
 - AI 产品经理
 - 算法策略同学
 - 商家增长团队
 
-## 4. User goals
+## 4. 用户目标
 
 1. 在短时间内看懂一批评论反映了什么问题。
 2. 快速得到可执行的卖点和优化方向。
 3. 降低“AI 总结不可信”的担忧，看到结果来源。
-4. 对不同 Prompt 或 workflow 的效果进行基本对比。
+4. 对不同提示词或工作流的效果进行基本对比。
 
-## 5. Core scenarios
+## 5. 核心场景
 
-### Scenario A: 评论洞察
+### 场景 A：评论洞察
 
 用户上传评论数据后，系统输出：
 
@@ -54,7 +54,7 @@ Review Insight Copilot
 - 高频问题列表
 - 典型代表评论
 
-### Scenario B: 商品文案优化
+### 场景 B：商品文案优化
 
 基于评论洞察，系统生成：
 
@@ -62,21 +62,21 @@ Review Insight Copilot
 - 商品标题改写建议
 - 详情页卖点描述建议
 
-### Scenario C: FAQ 草案生成
+### 场景 C：FAQ 草案生成
 
 系统根据评论和问答自动生成常见问题及建议回答。
 
-### Scenario D: Prompt 评估
+### 场景 D：提示词评估
 
-用户对比两版 Prompt 的输出效果，查看：
+用户对比两版提示词的输出效果，查看：
 
 - 结构完整度
 - 引用覆盖情况
 - 人工主观偏好
 
-## 6. MVP feature list
+## 6. MVP 功能列表
 
-### Feature 1: Data input
+### 功能 1：数据输入
 
 支持导入 JSON 格式的评论和问答数据。
 
@@ -88,7 +88,7 @@ Review Insight Copilot
 - content
 - created_at
 
-### Feature 2: Theme extraction
+### 功能 2：主题抽取
 
 首版以轻量规则方式提取：
 
@@ -97,9 +97,9 @@ Review Insight Copilot
 - 主题频次
 - 主题示例
 
-后续版本可接入 LLM 做主题命名与总结优化。
+后续版本可接入真实 LLM 做主题命名与总结优化。
 
-### Feature 3: Opportunity summary
+### 功能 3：机会总结
 
 输出三类产品化结果：
 
@@ -107,7 +107,7 @@ Review Insight Copilot
 - 推荐强化卖点
 - 建议优化点
 
-### Feature 4: Content generation
+### 功能 4：内容生成
 
 生成：
 
@@ -115,19 +115,19 @@ Review Insight Copilot
 - FAQ 草案
 - 标题或短描述改写建议
 
-### Feature 5: Citation grounding
+### 功能 5：引用关联
 
 每条结论附带引用评论 ID 或原始文本片段。
 
-### Feature 6: Evaluation
+### 功能 6：评估
 
-支持对不同 Prompt 版本做基础评估，至少包括：
+支持对不同提示词版本做基础评估，至少包括：
 
 - 引用率
 - 结构完整度
 - 人工可用性评分
 
-## 7. Out of scope
+## 7. 暂不纳入范围
 
 第一版不做：
 
@@ -137,35 +137,35 @@ Review Insight Copilot
 - 复杂多 Agent 系统
 - 真正的生产级向量数据库
 
-## 8. User flow
+## 8. 用户流程
 
 1. 选择示例商品数据。
 2. 点击生成分析。
 3. 查看评论主题和用户痛点。
 4. 查看卖点建议、FAQ 与文案改写结果。
 5. 打开引用来源验证结果。
-6. 切换 Prompt 版本，查看评估对比。
+6. 切换提示词版本，查看评估对比。
 
-## 9. Success metrics
+## 9. 成功指标
 
-### Product metrics
+### 产品指标
 
 - 单次分析完成时间
 - 用户点击引用来源比例
 - 生成结果被保留/采纳比例
 
-### Model metrics
+### 模型指标
 
-- citation coverage
-- hallucination rate
-- structure completeness
-- human preference score
+- 引用覆盖率
+- 幻觉率
+- 结构完整度
+- 人工偏好分数
 
 ## 10. 项目价值
 
 这个项目聚焦以下几个产品价值点：
 
 - 将非结构化评论转成可消费的结构化结论
-- 将主题抽取、内容生成与引用回看串成完整 workflow
+- 将主题抽取、内容生成与引用回看串成完整工作流
 - 为评论洞察结果提供基础评估维度
 - 为后续接入真实 LLM 与线上部署预留清晰扩展路径
