@@ -49,8 +49,7 @@ function humanizeAnalysisMode(mode) {
 
 function humanizeModelName(modelName) {
   const mapping = {
-    "deepseek-v4-pro": "DeepSeek-V4-Pro",
-    "deepseek-v4-flash": "DeepSeek-V4-Flash"
+    "deepseek-v4-pro": "DeepSeek-V4-Pro"
   };
 
   return mapping[modelName] || modelName;
