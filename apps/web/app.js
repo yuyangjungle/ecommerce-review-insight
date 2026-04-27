@@ -47,11 +47,21 @@ function humanizeAnalysisMode(mode) {
   return mapping[mode] || "未知模式";
 }
 
+function humanizeModelName(modelName) {
+  const mapping = {
+    "deepseek-v4-pro": "DeepSeek-V4-Pro",
+    "deepseek-v4-flash": "DeepSeek-V4-Flash"
+  };
+
+  return mapping[modelName] || modelName;
+}
+
 function buildModelLabel(runtime = {}) {
   if (!runtime.model_name) {
     return "未接入";
   }
-  return runtime.provider_name ? `${runtime.provider_name} / ${runtime.model_name}` : runtime.model_name;
+  const displayName = humanizeModelName(runtime.model_name);
+  return runtime.provider_name ? `${runtime.provider_name} / ${displayName}` : displayName;
 }
 
 function renderRuntimeStatus(runtime = {}, warnings = []) {
