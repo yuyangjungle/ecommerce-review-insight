@@ -79,13 +79,13 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run_demo.ps1
 
 ## 真实模型接入
 
-项目默认以 `mock` 模式运行；如果希望启用真实模型混合模式，优先推荐使用 DeepSeek：
+项目默认以 `mock` 模式运行；如果希望启用真实模型混合模式，优先推荐使用 DeepSeek-V4-Pro：
 
 ```powershell
 $env:REVIEW_INSIGHT_USE_LLM="auto"
 $env:DEEPSEEK_API_KEY="你的 API Key"
 $env:DEEPSEEK_BASE_URL="https://api.deepseek.com"
-$env:DEEPSEEK_MODEL="deepseek-v4-flash"
+$env:DEEPSEEK_MODEL="deepseek-v4-pro"
 ```
 
 说明：
