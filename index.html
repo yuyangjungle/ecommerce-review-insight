@@ -10,11 +10,10 @@
     <div class="page-shell">
       <header class="hero">
         <div class="hero-copy">
-          <p class="eyebrow">AI 产品作品演示</p>
+          <p class="eyebrow">AI Review Insight Workbench</p>
           <h1>电商评论洞察助手</h1>
           <p class="hero-text">
-            把商品评论、问答与用户反馈转成可执行的卖点、FAQ 与优化建议，并对不同
-            工作流的输出质量做可视化比较。
+            将商品评论、问答与用户反馈转成可执行的用户洞察、卖点建议、FAQ 草案与优化方向。
           </p>
           <div class="runtime-banner">
             <article class="runtime-item">
@@ -25,6 +24,10 @@
               <span>模型</span>
               <strong id="runtime-model-banner">--</strong>
             </article>
+          </div>
+          <div class="trust-row">
+            <span class="status-dot" id="runtime-live-dot" aria-hidden="true"></span>
+            <span id="runtime-live-copy">正在确认运行环境</span>
           </div>
         </div>
 
@@ -49,12 +52,16 @@
             </label>
 
             <div class="button-row">
-              <button type="submit" class="action-button primary">运行分析</button>
-              <button type="button" id="compare-btn" class="action-button secondary">比较 v1 和 v2</button>
+              <button type="submit" class="action-button primary" data-action>运行分析</button>
+              <button type="button" id="compare-btn" class="action-button secondary" data-action>比较 v1 和 v2</button>
             </div>
 
             <div class="button-row compact">
-              <button type="button" id="clear-upload-btn" class="action-button ghost">切回样例数据</button>
+              <button type="button" id="clear-upload-btn" class="action-button ghost" data-action>切回样例数据</button>
+            </div>
+            <div class="button-row compact">
+              <button type="button" id="export-btn" class="action-button ghost" data-action disabled>导出 Markdown 报告</button>
+              <button type="button" id="copy-summary-btn" class="action-button ghost" data-action disabled>复制核心摘要</button>
             </div>
 
             <p class="helper-text" id="source-status">
@@ -95,6 +102,14 @@
       </section>
 
       <main class="dashboard">
+        <section class="card card-wide workflow-card">
+          <div class="section-head">
+            <h2>Workflow</h2>
+            <p id="workflow-summary">--</p>
+          </div>
+          <div class="workflow-steps" id="workflow-steps"></div>
+        </section>
+
         <section class="card card-wide summary-card">
           <div class="section-head">
             <h2>核心摘要</h2>

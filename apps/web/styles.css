@@ -1,15 +1,17 @@
 :root {
-  --bg: #f7f1e8;
-  --panel: #fffaf3;
-  --ink: #1f2229;
-  --muted: #666252;
-  --line: rgba(31, 34, 41, 0.1);
-  --accent: #d95f39;
-  --accent-soft: #f4d0c2;
-  --accent-deep: #8f2e16;
-  --success: #1f7a52;
+  --bg: #f4f7f6;
+  --panel: #ffffff;
+  --panel-soft: #f8fbfa;
+  --ink: #17211e;
+  --muted: #5f6f6a;
+  --line: rgba(23, 33, 30, 0.12);
+  --accent: #116b5f;
+  --accent-soft: #dff3ef;
+  --accent-deep: #084a42;
+  --warning: #b45c2f;
+  --success: #15734f;
   --error: #a33a2e;
-  --shadow: 0 18px 50px rgba(83, 54, 30, 0.12);
+  --shadow: 0 16px 38px rgba(25, 48, 43, 0.08);
 }
 
 * {
@@ -20,9 +22,10 @@ body {
   margin: 0;
   font-family: "Aptos", "Segoe UI", sans-serif;
   background:
-    radial-gradient(circle at top left, rgba(217, 95, 57, 0.12), transparent 24%),
-    radial-gradient(circle at top right, rgba(217, 95, 57, 0.08), transparent 18%),
-    linear-gradient(180deg, #f7f1e8 0%, #f3e8da 100%);
+    linear-gradient(rgba(17, 107, 95, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 107, 95, 0.035) 1px, transparent 1px),
+    var(--bg);
+  background-size: 28px 28px;
   color: var(--ink);
 }
 
@@ -44,11 +47,10 @@ body {
 .hero-panel,
 .card,
 .hero-stat {
-  background: rgba(255, 250, 243, 0.82);
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid var(--line);
-  border-radius: 26px;
+  border-radius: 8px;
   box-shadow: var(--shadow);
-  backdrop-filter: blur(8px);
 }
 
 .hero-copy {
@@ -67,8 +69,8 @@ body {
 h1 {
   margin: 0;
   font-size: clamp(34px, 5vw, 56px);
-  line-height: 0.95;
-  letter-spacing: -0.04em;
+  line-height: 1;
+  letter-spacing: 0;
 }
 
 .hero-text {
@@ -88,8 +90,8 @@ h1 {
 
 .runtime-item {
   padding: 16px 18px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  background: var(--panel-soft);
   border: 1px solid var(--line);
 }
 
@@ -106,7 +108,33 @@ h1 {
   margin-top: 8px;
   font-size: 18px;
   line-height: 1.5;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
+}
+
+.trust-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--warning);
+  box-shadow: 0 0 0 4px rgba(180, 92, 47, 0.12);
+}
+
+.status-dot[data-state="live"] {
+  background: var(--success);
+  box-shadow: 0 0 0 4px rgba(21, 115, 79, 0.12);
 }
 
 .hero-panel {
@@ -136,9 +164,9 @@ h1 {
 .control-field select {
   width: 100%;
   padding: 13px 14px;
-  border-radius: 16px;
+  border-radius: 8px;
   border: 1px solid var(--line);
-  background: #fffdfa;
+  background: var(--panel);
   color: var(--ink);
   font-size: 15px;
 }
@@ -146,9 +174,9 @@ h1 {
 .control-field input[type="file"] {
   width: 100%;
   padding: 11px 14px;
-  border-radius: 16px;
+  border-radius: 8px;
   border: 1px dashed rgba(31, 34, 41, 0.18);
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--panel-soft);
   color: var(--muted);
   font-size: 14px;
 }
@@ -165,7 +193,7 @@ h1 {
 
 .action-button {
   border: none;
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 13px 16px;
   font-size: 15px;
   font-weight: 700;
@@ -177,13 +205,19 @@ h1 {
   transform: translateY(-1px);
 }
 
+.action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
 .primary {
   background: var(--accent);
   color: white;
 }
 
 .secondary {
-  background: rgba(217, 95, 57, 0.12);
+  background: var(--accent-soft);
   color: var(--accent-deep);
 }
 
@@ -200,7 +234,7 @@ h1 {
 }
 
 .warning-text {
-  color: var(--accent-deep);
+  color: var(--warning);
 }
 
 .status-line {
@@ -237,7 +271,7 @@ h1 {
 
 .hero-stat strong {
   font-size: 22px;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
 }
 
 .dashboard {
@@ -255,9 +289,7 @@ h1 {
 }
 
 .summary-card {
-  background:
-    radial-gradient(circle at top right, rgba(217, 95, 57, 0.08), transparent 30%),
-    rgba(255, 250, 243, 0.82);
+  background: rgba(255, 255, 255, 0.94);
 }
 
 .section-head {
@@ -292,9 +324,10 @@ h1 {
 .metric-card,
 .compare-card,
 .review-card,
-.mini-metric {
+.mini-metric,
+.workflow-step {
   padding: 16px;
-  border-radius: 20px;
+  border-radius: 8px;
   background: var(--panel);
   border: 1px solid var(--line);
 }
@@ -324,7 +357,7 @@ h1 {
   margin: 0 0 12px;
   font-size: clamp(24px, 3vw, 34px);
   line-height: 1.15;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
 }
 
 .overview-main p {
@@ -346,7 +379,7 @@ h1 {
   margin-top: 8px;
   font-size: 20px;
   line-height: 1.45;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
 }
 
 .review-feed {
@@ -375,13 +408,13 @@ h1 {
 
 .chip {
   padding: 16px;
-  border-radius: 20px;
+  border-radius: 8px;
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(244, 208, 194, 0.4));
+  background: linear-gradient(180deg, #ffffff, #eef8f6);
 }
 
 .chip.negative {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(217, 95, 57, 0.12));
+  background: linear-gradient(180deg, #ffffff, #fff4ed);
 }
 
 .chip-title {
@@ -449,7 +482,7 @@ h1 {
 
 .metric-card strong {
   font-size: 32px;
-  letter-spacing: -0.05em;
+  letter-spacing: 0;
 }
 
 .compare-card {
@@ -482,22 +515,46 @@ h1 {
 
 .compare-metrics div {
   padding: 12px;
-  border-radius: 16px;
-  background: rgba(217, 95, 57, 0.08);
+  border-radius: 8px;
+  background: var(--panel-soft);
 }
 
 .compare-metrics strong {
   display: block;
   margin-top: 6px;
   font-size: 24px;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
 }
 
 .empty-state {
   padding: 18px;
-  border-radius: 18px;
+  border-radius: 8px;
   background: rgba(31, 34, 41, 0.04);
   color: var(--muted);
+}
+
+.workflow-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.workflow-step span {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.workflow-step strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 16px;
+}
+
+.workflow-step p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
 }
 
 .drawer-shell[hidden] {
@@ -524,7 +581,7 @@ h1 {
   width: min(420px, 100%);
   height: 100%;
   padding: 26px 22px;
-  background: #fffaf3;
+  background: var(--panel);
   border-left: 1px solid var(--line);
   box-shadow: -20px 0 60px rgba(0, 0, 0, 0.12);
   display: grid;
@@ -551,14 +608,14 @@ h1 {
 .drawer-head h3 {
   margin: 0;
   font-size: 28px;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
 }
 
 .drawer-close {
   width: 40px;
   height: 40px;
   border: none;
-  border-radius: 999px;
+  border-radius: 8px;
   background: rgba(31, 34, 41, 0.06);
   font-size: 28px;
   line-height: 1;
@@ -582,7 +639,7 @@ h1 {
 
 .drawer-content {
   padding: 18px;
-  border-radius: 20px;
+  border-radius: 8px;
   background: rgba(31, 34, 41, 0.04);
   line-height: 1.8;
   color: var(--ink);

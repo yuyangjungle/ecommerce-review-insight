@@ -31,3 +31,6 @@ class JsonHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    def send_error_json(self, message, status=HTTPStatus.BAD_REQUEST):
+        self.send_json({"error": str(message)}, status)

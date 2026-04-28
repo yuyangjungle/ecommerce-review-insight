@@ -1,6 +1,7 @@
 .next/
 node_modules/
 .venv/
+.vercel/
 __pycache__/
 *.pyc
 *.pyc.*
@@ -14,6 +15,7 @@ eval/results/
 *.db
 .env
 .env.local
+logs/
 demo-server.err.log
 demo-server.out.log
 static-site.err.log

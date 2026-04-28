@@ -36,7 +36,7 @@ def _read_mode_setting() -> str:
 
 def load_llm_config() -> LLMConfig:
     mode_setting = _read_mode_setting()
-    timeout_seconds = int(os.getenv("OPENAI_TIMEOUT_SECONDS") or "45")
+    timeout_seconds = int(os.getenv("OPENAI_TIMEOUT_SECONDS") or "55")
 
     deepseek_api_key = (os.getenv("DEEPSEEK_API_KEY") or "").strip() or None
     openai_api_key = (os.getenv("OPENAI_API_KEY") or "").strip() or None
@@ -169,7 +169,7 @@ def _call_llm_for_refinement(prompt_messages: List[Dict], config: LLMConfig) -> 
         "model": config.model_name,
         "messages": prompt_messages,
         "temperature": 0.3,
-        "max_tokens": 1600,
+        "max_tokens": 900,
     }
     if config.provider_name == "DeepSeek":
         base_payload["thinking"] = {"type": "disabled"}
@@ -209,7 +209,7 @@ def _build_refinement_messages(result: Dict, prompt_version: str) -> List[Dict]:
         "copy_suggestions": result["assets"]["copy_suggestions"],
         "faqs": result["assets"]["faqs"],
         "optimization_suggestions": result["assets"]["optimization_suggestions"],
-        "reviews": result["source_reviews"][:6],
+        "reviews": result["source_reviews"][:4],
     }
 
     schema = {

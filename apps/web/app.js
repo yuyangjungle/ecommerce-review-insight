@@ -4,7 +4,25 @@ const state = {
   compareResult: null,
   uploadedDataset: null,
   uploadedFileName: "",
-  runtime: null
+  runtime: null,
+  isRunning: false,
+  lastDurationMs: null
+};
+
+const WORKFLOW_STEPS = {
+  v1: [
+    ["输入", "评论数据标准化"],
+    ["生成", "直接总结评论内容"],
+    ["整理", "输出卖点与 FAQ 草案"],
+    ["评估", "计算结构完整度与引用覆盖率"]
+  ],
+  v2: [
+    ["输入", "评论数据标准化"],
+    ["抽取", "先识别正负向主题"],
+    ["绑定", "为结论保留引用证据"],
+    ["生成", "由 LLM 润色内容层输出"],
+    ["评估", "对比可用性与可信度指标"]
+  ]
 };
 
 function fetchJSON(url, options = {}) {
@@ -37,6 +55,18 @@ function setStatus(message, type = "neutral") {
   node.dataset.state = type;
 }
 
+function setBusy(isRunning) {
+  state.isRunning = isRunning;
+  document.body.dataset.loading = isRunning ? "true" : "false";
+  document.querySelectorAll("[data-action]").forEach((button) => {
+    if (button.id === "export-btn" || button.id === "copy-summary-btn") {
+      button.disabled = isRunning || !state.currentResult;
+    } else {
+      button.disabled = isRunning;
+    }
+  });
+}
+
 function humanizeAnalysisMode(mode) {
   const mapping = {
     mock: "规则抽取（mock）",
@@ -63,6 +93,17 @@ function buildModelLabel(runtime = {}) {
   return runtime.provider_name ? `${runtime.provider_name} / ${displayName}` : displayName;
 }
 
+function updateLiveRuntimeCopy(runtime = {}) {
+  const dot = document.getElementById("runtime-live-dot");
+  const copy = document.getElementById("runtime-live-copy");
+  const isRealModel = runtime.analysis_mode === "hybrid_llm";
+
+  dot.dataset.state = isRealModel ? "live" : "mock";
+  copy.textContent = isRealModel
+    ? `真实模型运行中：${buildModelLabel(runtime)}`
+    : "当前为规则/模拟运行，线上完整部署需要配置服务端密钥";
+}
+
 function renderRuntimeStatus(runtime = {}, warnings = []) {
   const modeText = humanizeAnalysisMode(runtime.analysis_mode || "mock");
   const modelText = buildModelLabel(runtime);
@@ -79,6 +120,7 @@ function renderRuntimeStatus(runtime = {}, warnings = []) {
   } else {
     warningNode.textContent = "当前使用本地模拟结果，接入 DEEPSEEK_API_KEY 后会自动启用混合模式。";
   }
+  updateLiveRuntimeCopy(runtime);
 }
 
 function emptyState(message) {
@@ -242,6 +284,71 @@ function renderMetrics(result) {
     .join("");
 }
 
+function renderWorkflow(result) {
+  const metadata = result.metadata || {};
+  const promptVersion = metadata.prompt_version || "v2";
+  const steps = WORKFLOW_STEPS[promptVersion] || WORKFLOW_STEPS.v2;
+  const modelText = buildModelLabel(metadata);
+  const modeText = humanizeAnalysisMode(metadata.analysis_mode);
+
+  document.getElementById("workflow-summary").textContent =
+    `${metadata.workflow_label || promptVersion} · ${modeText} · ${modelText}`;
+  document.getElementById("workflow-steps").innerHTML = steps
+    .map(
+      ([label, text], index) => `
+        <article class="workflow-step">
+          <span>${String(index + 1).padStart(2, "0")}</span>
+          <strong>${escapeHtml(label)}</strong>
+          <p>${escapeHtml(text)}</p>
+        </article>
+      `
+    )
+    .join("");
+}
+
+function buildMarkdownReport(result) {
+  const lines = [
+    `# ${result.product_name} 评论洞察报告`,
+    "",
+    `- 工作流：${result.metadata.workflow_label}`,
+    `- 运行模式：${humanizeAnalysisMode(result.metadata.analysis_mode)}`,
+    `- 模型：${buildModelLabel(result.metadata)}`,
+    `- 引用覆盖率：${Math.round(result.evaluation.citation_coverage * 100)}%`,
+    "",
+    "## 核心摘要",
+    result.overview?.executive_summary || "",
+    "",
+    "## 主要机会",
+    ...(result.summary.top_positive_themes || []).map((item) => `- ${item.title}：${item.summary}`),
+    "",
+    "## 主要风险",
+    ...(result.summary.top_negative_themes || []).map((item) => `- ${item.title}：${item.summary}`),
+    "",
+    "## 卖点建议",
+    ...(result.assets.selling_points || []).map((item) => `- ${item.title}：${item.content}`),
+    "",
+    "## FAQ 草案",
+    ...(result.assets.faqs || []).map((item) => `- ${item.question}：${item.answer}`),
+    "",
+    "## 优化方向",
+    ...(result.assets.optimization_suggestions || []).map((item) => `- ${item.title}：${item.content}`)
+  ];
+
+  return lines.join("\n");
+}
+
+function downloadText(filename, content) {
+  const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 function renderCompare(compareResult) {
   const section = document.getElementById("compare-section");
   const winner = document.getElementById("compare-winner");
@@ -307,6 +414,7 @@ function renderResult(result) {
     : "内置样例";
   renderRuntimeStatus(state.runtime, result.metadata.warnings || []);
 
+  renderWorkflow(result);
   renderOverview(result);
   renderSourceReviews(result);
   renderQuestions(result);
@@ -322,6 +430,7 @@ function renderResult(result) {
     "这个提示词版本没有稳定输出优化建议。"
   );
   renderMetrics(result);
+  setBusy(false);
 }
 
 function normalizeUploadedDataset(input, fileName) {
@@ -385,40 +494,52 @@ async function loadRuntimeStatus() {
 async function runAnalysis() {
   const promptVersion = document.getElementById("prompt-select").value;
   setStatus("正在运行分析...", "loading");
+  setBusy(true);
+  const startedAt = performance.now();
 
-  const result = await fetchJSON("/api/analyze", {
-    method: "POST",
-    body: JSON.stringify(buildDatasetPayload({ prompt_version: promptVersion }))
-  });
+  try {
+    const result = await fetchJSON("/api/analyze", {
+      method: "POST",
+      body: JSON.stringify(buildDatasetPayload({ prompt_version: promptVersion }))
+    });
 
-  renderResult(result);
-  const warnings = result.metadata.warnings || [];
-  if (warnings.length) {
-    setStatus(`已生成 ${result.product_name} 的分析结果，但模型调用失败并已回退为模拟结果。`, "neutral");
-  } else {
-    setStatus(`已生成 ${result.product_name} 的 ${result.metadata.workflow_label} 分析结果。`, "success");
+    state.lastDurationMs = Math.round(performance.now() - startedAt);
+    renderResult(result);
+    const warnings = result.metadata.warnings || [];
+    if (warnings.length) {
+      setStatus(`已生成 ${result.product_name} 的分析结果，但模型调用失败并已回退为模拟结果。`, "neutral");
+    } else {
+      setStatus(`已生成 ${result.product_name} 的 ${result.metadata.workflow_label} 分析结果，用时 ${(state.lastDurationMs / 1000).toFixed(1)}s。`, "success");
+    }
+  } finally {
+    setBusy(false);
   }
 }
 
 async function runCompare() {
   setStatus("正在比较两套提示词工作流...", "loading");
+  setBusy(true);
 
-  const result = await fetchJSON("/api/evaluate", {
-    method: "POST",
-    body: JSON.stringify(buildDatasetPayload({
-      left_prompt_version: "v1",
-      right_prompt_version: "v2"
-    }))
-  });
+  try {
+    const result = await fetchJSON("/api/evaluate", {
+      method: "POST",
+      body: JSON.stringify(buildDatasetPayload({
+        left_prompt_version: "v1",
+        right_prompt_version: "v2"
+      }))
+    });
 
-  state.compareResult = result;
-  renderCompare(result);
-  const leftWarnings = result.left?.result?.metadata?.warnings || [];
-  const rightWarnings = result.right?.result?.metadata?.warnings || [];
-  if (leftWarnings.length || rightWarnings.length) {
-    setStatus("提示词对比已更新，其中至少一侧因模型调用失败回退为模拟结果。", "neutral");
-  } else {
-    setStatus("提示词对比结果已更新。", "success");
+    state.compareResult = result;
+    renderCompare(result);
+    const leftWarnings = result.left?.result?.metadata?.warnings || [];
+    const rightWarnings = result.right?.result?.metadata?.warnings || [];
+    if (leftWarnings.length || rightWarnings.length) {
+      setStatus("提示词对比已更新，其中至少一侧因模型调用失败回退为模拟结果。", "neutral");
+    } else {
+      setStatus("提示词对比结果已更新。", "success");
+    }
+  } finally {
+    setBusy(false);
   }
 }
 
@@ -493,6 +614,28 @@ function attachEvents() {
     }
   });
 
+  document.getElementById("export-btn").addEventListener("click", () => {
+    if (!state.currentResult) {
+      return;
+    }
+    const filename = `${state.currentResult.dataset_id || "review-insight"}-report.md`;
+    downloadText(filename, buildMarkdownReport(state.currentResult));
+    setStatus("Markdown 报告已导出。", "success");
+  });
+
+  document.getElementById("copy-summary-btn").addEventListener("click", async () => {
+    if (!state.currentResult) {
+      return;
+    }
+    const summary = state.currentResult.overview?.executive_summary || "";
+    if (!navigator.clipboard) {
+      setStatus("当前浏览器不支持直接复制，请使用导出报告。", "neutral");
+      return;
+    }
+    await navigator.clipboard.writeText(summary);
+    setStatus("核心摘要已复制。", "success");
+  });
+
   document.body.addEventListener("click", (event) => {
     const citationButton = event.target.closest("[data-review-id]");
     if (citationButton) {
@@ -508,6 +651,7 @@ function attachEvents() {
 
 async function bootstrap() {
   attachEvents();
+  setBusy(false);
   setStatus("正在加载数据集...", "loading");
 
   try {
